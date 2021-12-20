@@ -1,0 +1,47 @@
+HELP.md
+../.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+/build_front
+/src/main/resources/version.txt
+/src/main/resources/static
+/docker/tar
+/docker/build/cras_test
+/docker/build/logmonitor.war
+/Release/logmonitor_images_*.tar.gz
+/Release/cras.tar
+/setup_Log_Monitor_Ver_*.zip

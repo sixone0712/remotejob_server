@@ -1,0 +1,90 @@
+springdoc:
+  version: '1.0'
+  title: Log Monitor
+  description: List of Rest APIs used by Log Monitor
+  api-docs:
+    enable: false
+#    path: /api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  swagger-ui:
+    operations-sorter: alpha
+    tags-sorter: alpha
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    display-query-params-without-oauth2: true
+    url: /openapi.json
+  paths-to-match:
+    - /api/v1/**
+
+spring:
+  datasource:
+    initialization-mode: always
+    username: rssadmin
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/logdb?characterEncoding=UTF-8
+  jpa:
+    properties:
+      hibernate:
+        #format_sql: true
+        default_schema: log_manager
+    #show-sql: true
+    hibernate:
+      ddl-auto: update
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+        #logging:
+        #level:
+        #org:
+        #hibernate:
+        #type:
+      #descriptor:
+      #sql: trace
+file:
+  upload-dir: C:/Temp/upload
+  download-dir: C:/Temp/download
+  file-delete-scheduled: 0 0 0 * * *
+
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    context-path: /logmonitor
+
+manager:
+  log-collect-before: 30
+
+cras-support:
+  application: C:/rss/cras/cras.tar
+
+cras-data:
+  file-name: cras_data.xlsx
+  sheet-cras-data: cras_data
+  sheet-cras-item: cras_item_master
+  sheet-cras-data-header: cras_index, user_name, fab_name, item_name, target_table, target_col1, target_col2, operations, calc_period_unit, coef, group_col, where_str, col_type, comments, enable
+  sheet-cras-item-master-header: cras_id, user_name, fab_name, item_name, calc_range, condition, threshold, compare, title, description, enable, unit
+
+convert-data:
+  file-name: convert_data.xlsx
+  cras-server-address: http://10.1.31.231:5000
+
+dev-log:
+  log-monitor:
+    zip-file-name: dev_log_logmonitor.zip
+  cras-server:
+    zip-file-name: dev_cras_server.zip
+    cras-server-docker-name: Cras-Server
+    cras-server-docker-port: 5000
+
+error-log-download:
+  file-name: error_log_download_setting.xlsx
+  sheet-error-log-download: error_log_download_setting
+  sheet-error-log-download-header: No, Error Code, VFTP/FTP, Log Name/Command, Days Before, Days After
+
+logmonitor:
+  logging:
+    root: C:/Temp/logs/

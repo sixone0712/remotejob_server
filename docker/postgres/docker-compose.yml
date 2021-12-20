@@ -1,0 +1,15 @@
+version: '3'
+services:
+  postgresql:
+    image: postgres:13-alpine
+    container_name: postgresql
+    restart: always
+    # volumes:
+    #   - ./postgresql/data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: 'rssadmin'
+      POSTGRES_PASSWORD: '1234'
+      POSTGRES_DB: 'logdb'
+      TZ: 'Asia/Seoul'

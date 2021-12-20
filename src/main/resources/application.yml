@@ -1,0 +1,39 @@
+spring:
+  profiles:
+    active: release
+
+springdoc:
+  version: '@project.version@'
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  swagger-ui:
+    operations-sorter: alpha
+    tags-sorter: alpha
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+  paths-to-match:
+    - /api/status/**
+    - /api/configure/**
+
+auth:
+  jwt:
+    access-token-valid-time: 240      # 4 Hour(Unit: Minute)
+    refresh-token-valid-time: 43200   # 30 Day(Unit: Minute)
+    auto-refresh-time: 1440           # 1 Day(Unit: Minute)
+    token-time-unit: minute
+    salt: canon
+    delete-scheduled: 0 0 0 * * *
+
+configure:
+  cras-localhost-name: Cras-Server
+
+server:
+  error:
+    include-message: ALWAYS
+    #include-stacktrace: NEVER
+
+logmonitor:
+  logging:
+    root: logs

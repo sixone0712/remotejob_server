@@ -1,0 +1,3 @@
+[submodule "cras-server-application"]
+	path = cras-server-application
+	url = http://10.1.9.22:9080/ted/cras-server-application.git

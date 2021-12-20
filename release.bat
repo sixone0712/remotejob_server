@@ -1,0 +1,1 @@
+cmd /c gradlew.bat release_setup -Pprofile=release

@@ -1,0 +1,257 @@
+plugins {
+    id 'org.springframework.boot' version '2.4.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'war'
+    id 'jacoco'
+}
+
+group = 'jp.co.canon.rss'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+// disable git info
+// String git_rev = 'git rev-parse --verify --long HEAD'.execute().text.trim();
+
+allprojects {
+    version '2.1.0'
+}
+
+String versionStr = project.version
+
+bootWar {
+    archiveFileName = "logmonitor.war"
+    manifest {
+        attributes("Implementation-Version": project.version)
+        attributes("Log-Monitor-Version": project.version)
+        // disable git info
+        // attributes("GIT-REV": git_rev)
+    }
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.projectlombok:lombok'
+    implementation 'junit:junit:4.13.1'
+    implementation 'junit:junit:4.13.1'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    implementation group: 'org.wso2.apache.httpcomponents', name: 'httpclient', version: '4.3.1.wso2v1'
+    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.3.2'
+
+    // JSON 데이터 사용 관련 라이브러리
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
+
+    // SWAGGER 관련
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.9'
+
+    // MAIL 관련
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
+    // gson
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+
+    implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.12.0'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compile "org.springframework.boot:spring-boot-starter-security"
+
+    // TSV Parser
+    implementation group: 'com.univocity', name: 'univocity-parsers', version: '2.9.1'
+
+    // Excel
+    compile group: 'org.apache.poi', name: 'poi', version: '5.0.0'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
+
+    // zip
+    implementation group: 'org.zeroturnaround', name: 'zt-zip', version: '1.14'
+
+    // file to multipartfile
+    compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+
+    // localjob : MultipartBodyBuilder
+    compile group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.0'
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacoco {
+    toolVersion = '0.8.5'
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+
+        html.destination file("$buildDir/jacocoHtml")
+    }
+
+    afterEvaluate {
+        classDirectories.from = files(classDirectories.files.collect {
+            fileTree(
+                    dir: it,
+                    exclude: [
+                            "jp/co/canon/cks/eec/fs/manage/**",
+                            "jp/co/canon/cks/eec/fs/portal/**",
+                            "jp/co/canon/cks/eec/util/ftp/**",
+                    ])
+        })
+    }
+}
+
+//build war
+task update_front_src(type:Exec, dependsOn: []){
+    workingDir "/"
+    commandLine 'cmd', "/c", "update_front_src.bat"
+}
+
+task build_front(type:Exec, dependsOn: ['update_front_src']){
+    workingDir "/build_front/log-manager-front"
+    commandLine 'cmd', "/c", "yarn install && yarn build"
+}
+
+task delete_resoruce_static(type:Delete, dependsOn: [build_front]) {
+    delete files("/src/main/resources/static")
+}
+
+task copy_front_build(type:Copy, dependsOn: [
+        'delete_resoruce_static'
+]) {
+    from '/build_front/log-manager-front/build'
+    into '/src/main/resources/static'
+
+    from "LICENSE.md"
+    into "/src/main/resources/static"
+}
+
+task download_cras_source_file(type: Exec, dependsOn: []) {
+    workingDir "/docker/build"
+    commandLine 'cmd', '/c', 'copy_cras_source.bat'
+}
+
+task prepare_build(dependsOn:[]) {
+    doFirst {
+        print("prepare:doFirst")
+    }
+    doLast {
+        print("prepare:doLast")
+    }
+}
+
+task distribution_build_all(dependsOn: ["clean", "bootWar"]) {
+    bootWar.mustRunAfter('clean')
+    if (!project.hasProperty('profile') || !profile) {
+    } else {
+        bootWar.doLast {
+            println("copy from logmonitor.war to /docker/build")
+            copy {
+                from "build/libs/logmonitor.war"
+                into "docker/build"
+            }
+        }
+    }
+}
+
+task release(dependsOn: ["distribution_build_all"]) {
+    new File("src/main/resources", "version.txt").text=versionStr
+    copy {
+        from "LICENSE.md"
+        into "src/main/resources/static"
+    }
+    if (!project.hasProperty('profile') || !profile) {
+        compileJava
+    } else {
+        compileJava.dependsOn("prepare_build")
+    }
+}
+
+task build_and_save_docker(type:Exec, dependsOn: [release]) {
+  workingDir "/docker/build"
+  commandLine 'cmd', '/c', 'build_and_save.bat', versionStr
+}
+
+task build_and_push_docker(type:Exec, dependsOn: [release]) {
+    workingDir "/docker/build"
+    //commandLine 'cmd', '/c', 'build_and_push.bat', versionStr
+    commandLine 'cmd', '/c', 'build_and_push.bat'
+}
+
+task release_setup_copy_files(dependsOn: [
+    'build_and_save_docker'
+]){
+    doLast {
+        println("copy zip files")
+        copy {
+            from "/docker/tar/logmonitor_images_"+versionStr+".tar.gz"
+            into "/Release"
+        }
+        copy {
+            from "/docker/build/cras-server-application/cras.tar"
+            into "/Release"
+        }
+        println("create version.txt")
+        new File("Release", "version.txt").text=versionStr
+    }
+}
+
+task release_setup_zip_directories(type:Zip, dependsOn: [
+        'release_setup_copy_files'
+]){
+    archiveFileName = "setup_Log_Monitor_Ver_"+versionStr.replace('.', '_')+".zip"
+    destinationDirectory = file(".")
+
+    from "/Release"
+    into "setup_Log_Monitor_Ver_"+versionStr.replace('.', '_')
+
+    doFirst {
+        println("zip start")
+    }
+    doLast {
+        println("zip end")
+    }
+}
+
+task release_setup(dependsOn: ["release_setup_zip_directories"]){
+}
+
+task release_push(dependsOn: ["build_and_push_docker"]){
+}

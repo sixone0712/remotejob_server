@@ -1,0 +1,55 @@
+                                 RELEASE NOTES
+                                  Log Monitor
+
+These release notes are for the current development version of Log Monitor
+
+--------------------------------------------------------------------------------------------
+Date: 2021/12/03
+Version: 2.1.0
+*	New features
+	1) Error Log Download
+	2) Remote Job
+	 - Job Scheduling
+	 - DB Purge, Error Notification
+	 - Add Runnable Python Script each step
+
+Date: 2021/09/14
+Version: 2.0.1
+*	Bug Fixed
+	1) In Rapid Collector Server Setting, fix error during connection test
+	   and add localhost setting
+
+Date: 2021/09/09
+Version: 2.0.0
+*	New features
+	1) Editable converting rule interface.
+	2) Editable cras judgement rule interface.
+	3) User permission manager.
+	4) Address book.
+
+Date: 2021/07/10
+Version: 1.0.1
+*	New features
+	1) Separate the site name of Configure into company name and fab name.
+	2) Modified to delete only docker of log monitor when reinstalling.
+
+Date: 2021/06/11
+Version: 1.0.0
+*	New features
+	1) Remote Status
+	2) Local Status
+	3) Configuration
+
+*	Install Applications
+	1) Tomcat : 9.0.39
+	
+*	Web Application Environments
+	1) Spring Boot : 2.4.4
+	2) React : 17.0.1
+
+*	System Requirements
+	1) OS : CentOS 7.0
+	2) HTTP Server : Apache 2.4.46
+	3) RDBMS : PostgreSQL 13
+	4) JDK : openJDK 11
+--------------------------------------------------------------------------------------------
